@@ -11,11 +11,11 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args) throws FileNotFoundException {
-        File testfile = new File("D:\\ULE\\3º\\CE\\P1\\wine_normalizado_test.data");
+        File testfile = new File("D:\\Alberto GM\\ULE\\3º\\CE\\P1\\wine_normalizado_test.data");
         int[] n={0}; int[] s1={0};
         float[][] testdata = getArray(n,s1,testfile);
 
-        File trainfile = new File("D:\\ULE\\3º\\CE\\P1\\wine_normalizado_train.data");
+        File trainfile = new File("D:\\Alberto GM\\ULE\\3º\\CE\\P1\\wine_normalizado_train.data");
         int[] s2={0};
         float[][] traindata = getArray(new int[]{0},s2,trainfile);
 
@@ -77,12 +77,12 @@ public class Main {
         float errorM1_aceptable = (float) 0.2;
         float errorM2_aceptable = (float) 0.1;
         int tMax1=1;
-        int tMax2=s2;
+        int tMax2=3*s2;
 
         /** ENTRENAMIENTO */
-        while(errorM1>errorM1_aceptable && T>tMax1){
+        while(errorM1>errorM1_aceptable && T<tMax1){
             /** SUB - ENTRENAMIENTO */
-            while(errorM2>errorM2_aceptable && t>tMax2){
+            while(errorM2>errorM2_aceptable && t<tMax2){
                 for(int i=0; i<s2; i++){
                     float[] x = new float[n+1]; x[n] = 1;
                     for(int y=0; y<n; y++){x[y] = train[i][y];}
@@ -118,11 +118,11 @@ public class Main {
         }
         /** FIN ENTRENAMIENTO */
         //for(int i=0; i<s2; i++){ d2[i] = (int) train[i][n];}
-        float out=0;
+        /*float out=0;
         for(int i=0; i<n; i++){
             out+=train[8][i]*w[i];
-        }
-        System.out.println(d2[8]+" | "+out);
+        }*/
+        System.out.println(errorM1 + " , "+errorM2);
     }
 
     private static float[][] getArray(int[] n, int[] s, File file) throws FileNotFoundException {
