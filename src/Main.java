@@ -1,8 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.Random;
+import java.util.*;
 
 /**
  * @author Alberto Gutiérrez Morán
@@ -11,13 +9,15 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args) throws FileNotFoundException {
-        File testfile = new File("D:\\ULE\\3º\\CE\\P1\\wine_norm_test.data");
-        int[] n={0}; int[] s1={0};
-        float[][] testdata = getArray(n,s1,testfile);
+        boolean aleatorizar=true;
 
-        File trainfile = new File("D:\\ULE\\3º\\CE\\P1\\wine_norm_train.data");
+        File testfile = new File("D:\\Alberto GM\\ULE\\3º\\CE\\P1\\wine_norm_test.data");
+        int[] n={0}; int[] s1={0};
+        float[][] testdata = getArray(n,s1,testfile,aleatorizar);
+
+        File trainfile = new File("D:\\Alberto GM\\ULE\\3º\\CE\\P1\\wine_norm_train.data");
         int[] s2={0};
-        float[][] traindata = getArray(new int[]{0},s2,trainfile);
+        float[][] traindata = getArray(new int[]{0},s2,trainfile,aleatorizar);
 
         inciarSimulacion(traindata,testdata,n[0], new int[]{s1[0], s2[0]});
     }
@@ -107,8 +107,9 @@ public class Main {
                 et1+=0.5*(Math.pow((y-d1[i]),2));
                 /** VALIDACION DE MUESTRAS */
                 int aprox=0; /** SI Y<0.1 && Y>0.3 ENTONCES SALIDA=0 */
-                if(y>0.1) aprox=1; /** SI Y>0.1 ENTONCES SALIDA=1 */
-                if(y<-0.3) aprox=-1; /** SI Y<0.3 ENTONCES SALIDA=-1 */
+                if(y>0.35) aprox=1; /** SI Y>0.1 ENTONCES SALIDA=1 */
+                if(y<-0.35) aprox=-1; /** SI Y<0.3 ENTONCES SALIDA=-1 */
+                //System.out.println(y + " , "+aprox+ " , "+d1[i]);
                 if(aprox==d1[i]){
                     muestrasValidacionCorrectas++;
                 }else{
@@ -125,7 +126,7 @@ public class Main {
         System.out.println("Error Medio 1 (test): "+errorM1 + " , Error Medio 2 (train): "+errorM2);
     }
 
-    private static float[][] getArray(int[] n, int[] s, File file) throws FileNotFoundException {
+    private static float[][] getArray(int[] n, int[] s, File file, boolean rand) throws FileNotFoundException {
         Scanner sc = new Scanner(file);
         Scanner sc2 = new Scanner(file);
         boolean calculateS = true;
@@ -156,6 +157,20 @@ public class Main {
             if(!sc2.hasNextLine()){
                 break;
             }
+        }
+
+        if(rand){
+            List<Integer> posArray = new ArrayList<>();
+            for(int i=0; i<s[0]; i++){posArray.add(i);}
+            Collections.shuffle(posArray);
+            float[][] newArray = new float[s[0]][n[0]+1];
+            for(int i=0; i<s[0]; i++){
+                int row = posArray.get(i);
+                for(int x=0; x<=n[0]; x++){
+                    newArray[i][x] = array[row][x];
+                }
+            }
+            array = newArray;
         }
 
         return array;
@@ -200,7 +215,7 @@ public class Main {
         }
         if(op==2){
             if(modo==1) return (float) (2 / ( 1 +Math.exp(-x)) - 1);
-            if(modo==2) return (2 * funcion (op,x,1) * (1-funcion (op,x,1)));
+            if(modo==2) return (float) ((-2 * Math.exp(-x))/(Math.pow((1+Math.exp(-x)),2)));
         }
         if(op==3){
             if(modo==1) return (float)  (2 * Math.exp(Math.pow(-x,2)) - 1);
