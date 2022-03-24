@@ -11,27 +11,15 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args) throws FileNotFoundException {
-        File testfile = new File("D:\\Alberto GM\\ULE\\3º\\CE\\P1\\wine_normalizado_test.data");
+        File testfile = new File("D:\\ULE\\3º\\CE\\P1\\wine_norm_test.data");
         int[] n={0}; int[] s1={0};
         float[][] testdata = getArray(n,s1,testfile);
 
-        File trainfile = new File("D:\\Alberto GM\\ULE\\3º\\CE\\P1\\wine_normalizado_train.data");
+        File trainfile = new File("D:\\ULE\\3º\\CE\\P1\\wine_norm_train.data");
         int[] s2={0};
         float[][] traindata = getArray(new int[]{0},s2,trainfile);
 
-        /** PRINT DATA */
-        /*System.out.println("COLUMNAS: "+n[0]+" - FILAS: "+s1[0]);
-        for(int x=0; x<s1[0]; x++){
-            for(int y=0; y<=n[0]; y++){
-                System.out.print(testdata[x][y]+" ");
-            }
-            System.out.println();
-        }*/
-        /** END */
-
         inciarSimulacion(traindata,testdata,n[0], new int[]{s1[0], s2[0]});
-
-
     }
 
     private static void inciarSimulacion(float[][] train, float[][] test, int n, int[] s){
@@ -43,7 +31,7 @@ public class Main {
 
         int[] r = new int[n+1];
         for(int i=0; i<n; i++){
-            r[i] = (int) (Math.random()*10 + 1);
+            r[i] = (int) (Math.random()*5 + 1);
         }
         r[n]=1;
 
@@ -79,6 +67,9 @@ public class Main {
         int tMax1=1;
         int tMax2=3*s2;
 
+        int muestrasValidacionCorrectas=0;
+        int muestrasValidacionInCorrectas=0;
+
         /** ENTRENAMIENTO */
         while(errorM1>errorM1_aceptable && T<tMax1){
             /** SUB - ENTRENAMIENTO */
@@ -106,23 +97,32 @@ public class Main {
             }
             /** FIN SUB - ENTRENAMIENTO */
             float et1=0;
+            muestrasValidacionCorrectas=0;
+            muestrasValidacionInCorrectas=0;
             for(int i=0; i<s1; i++){
                 float[] x = new float[n+1]; x[n] = 1;
                 for(int y=0; y<n; y++){x[y] = test[i][y];}
                 float p = sumatorio(w,x,r);
                 float y = funcion(1,p,1);
                 et1+=0.5*(Math.pow((y-d1[i]),2));
+                /** VALIDACION DE MUESTRAS */
+                int aprox=0; /** SI Y<0.1 && Y>0.3 ENTONCES SALIDA=0 */
+                if(y>0.1) aprox=1; /** SI Y>0.1 ENTONCES SALIDA=1 */
+                if(y<-0.3) aprox=-1; /** SI Y<0.3 ENTONCES SALIDA=-1 */
+                if(aprox==d1[i]){
+                    muestrasValidacionCorrectas++;
+                }else{
+                    muestrasValidacionInCorrectas++;
+                }
+                /** FIN VALIDACION DE MUESTRAS */
             }
             errorM1 = et1/s1;
             T++;
         }
         /** FIN ENTRENAMIENTO */
-        //for(int i=0; i<s2; i++){ d2[i] = (int) train[i][n];}
-        /*float out=0;
-        for(int i=0; i<n; i++){
-            out+=train[8][i]*w[i];
-        }*/
-        System.out.println(errorM1 + " , "+errorM2);
+
+        System.out.println("Validaciones correctas: "+muestrasValidacionCorrectas + " , Validaciones incorrectas: "+muestrasValidacionInCorrectas);
+        System.out.println("Error Medio 1 (test): "+errorM1 + " , Error Medio 2 (train): "+errorM2);
     }
 
     private static float[][] getArray(int[] n, int[] s, File file) throws FileNotFoundException {
